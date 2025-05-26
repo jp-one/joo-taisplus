@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- odoo/addons/product/views/product_template_views.xml -->
+    <record id="product_template_tree_view" model="ir.ui.view">
+        <field name="name">product.template.product.tree</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="tais_code" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- odoo/addons/product/views/product_template_views.xml -->
+    <record id="product_template_only_form_view" model="ir.ui.view">
+        <field name="name">product.template.product.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <field name="barcode" position="after">
+                <field name="tais_code" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+            </field>
+        </field>
+    </record>
+    
+    <!-- odoo/addons/product/views/product_views.xml -->
+    <record id="product_template_search_view" model="ir.ui.view">
+        <field name="name">product.template.search</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <search string="Product">
+                <field name="name" string="名称/内部参照/TAIS" filter_domain="['|', '|', '|', '|', ('tais_code', '=', self), ('product_variant_ids.default_code', '=', self), ('default_code', 'ilike', self), ('product_variant_ids.default_code', 'ilike', self), ('name', 'ilike', self)]"/>
+                <separator/>
+                <filter string="福祉用具" name="filter_to_tais_product" domain="[('detailed_type','=','tais_product')]"/>
+                <separator/>
+                <filter string="販売可" name="filter_to_sell" domain="[('sale_ok','=',True)]"/>
+                <filter string="購買可" name="filter_to_purchase" domain="[('purchase_ok', '=', True)]"/>
+                <separator/>
+                <field string="属性" name="attribute_line_ids" groups="product.group_product_variant"/>
+                <separator/>
+                <filter string="お気に入り" name="favorites" domain="[('priority','=','1')]"/>
+                <separator/>
+                <filter string="アーカイブ" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- アクション -->
+    <record id="product_template_act_window" model="ir.actions.act_window">
+        <field name="name">福祉用具</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="product.product_template_kanban_view"/>
+        <field name="search_view_id" ref="product_template_search_view"/>
+        <field name="context">{"search_default_filter_to_tais_product":1}</field>
+    </record>
+
+</odoo>

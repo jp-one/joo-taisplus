@@ -1,0 +1,27 @@
+<odoo>
+    <record id="pricelist_import_tree" model="ir.ui.view">
+        <field name="name">pricelist import tree</field>
+        <field name="model">taisplus.pricelist.import</field>
+        <field name="arch" type="xml">
+            <form string="上限価格リストのインポート">
+                <group>
+                    <field name="file" filename="filename" />
+                    <field name="filename" invisible="1"/>
+                </group>
+                <footer>
+                    <button string="インポート実行" type="object" name="import_pricelist" class="btn-primary" />
+                    <button string="閉じる" class="btn-secondary" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- アクション -->
+    <record id="pricelist_import_act_window" model="ir.actions.act_window">
+        <field name="name">上限価格リストのインポート</field>
+        <field name="res_model">taisplus.pricelist.import</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    
+</odoo>

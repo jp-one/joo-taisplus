@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- odoo/addons/product/views/product_views.xml -->
+        <record id="product_product_tree_view" model="ir.ui.view">
+            <field name="name">product.product.tree</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="tais_code" optional="show" readonly="1"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- odoo/addons/product/views/product_views.xml -->
+        <record id="product_variant_easy_edit_view" model="ir.ui.view">
+            <field name="name">product.product.view.form.easy</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+            <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="tais_code"/>
+                </field>
+            </field>
+        </record>
+
+        <!-- odoo/addons/product/views/product_views.xml -->
+        <record id="product_normal_form_view" model="ir.ui.view">
+            <field name="name">product.product.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="tais_code"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
