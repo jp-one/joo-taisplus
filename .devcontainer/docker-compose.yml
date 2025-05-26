@@ -1,0 +1,60 @@
+version: '2'
+services:
+  app:
+    image: "odoo-addons-dev:18.0"
+    #container_name: "app"
+    build:
+      context: "."
+      dockerfile: odoo/Dockerfile
+      args:
+        # Update 'ODOO_VERSION' to pick a odoo version: master, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0
+        ODOO_VERSION: "18.0"
+        SUPPORT_RTLCSS: "true"
+        # Update 'VARIANT' to pick a Python version: 3, 3.6, 3.7, 3.8, 3.9, 3.10
+        # Available image variants: https://github.com/microsoft/vscode-dev-containers/blob/main/containers/python-3/README.md
+        VARIANT: "3.10"
+    volumes:
+      - ./odoo/.vscode:/opt/odoo/.vscode:cached
+      - ..:/opt/odoo/custom_addons:cached
+      - odoo-data:/opt/odoo/data
+      - ./odoo/scripts:/opt/odoo/scripts:cached
+      - ./odoo/entrypoint.sh:/opt/odoo/entrypoint.sh:cached
+      - ./odoo/odoo.conf:/etc/odoo/odoo.conf:cached
+      - ./odoo/.pulintrc:/home/vscode/.pylintrc:cached
+    env_file:
+      - ./odoo/odoo.env
+    depends_on: 
+      - db
+      - lb
+    tty: true
+    command: bash
+    entrypoint: /opt/odoo/entrypoint.sh
+  db:
+    image: postgres:12
+    #container_name: "db"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  lb:
+    image: nginx:alpine
+    #container_name: "lb"
+    build:
+      context: "."
+      dockerfile: nginx/Dockerfile
+      args:
+        # Generate self-signed SSL certificate and key
+        SSL_DAYS: "36500"
+        SSL_SUBJECT: "/C=JP/ST=Tokyo/L=City/O=Example/OU=Dev/CN=localhost"
+    volumes:
+    - ./nginx/conf.d:/etc/nginx/conf.d:cached
+    ports:
+    - 80:80
+    - 443:443
+volumes:
+  odoo-data:
+  postgres-data:
