@@ -1,0 +1,42 @@
+<odoo>
+  <data>
+    <!-- Top menu item -->
+    <menuitem name="福祉用具(TAIS+)" id="menu_root"/>
+    <!-- menu categories -->
+    <menuitem name="福祉用具" id="menu_product"
+              parent="menu_root" sequence="10"/>
+    <menuitem name="TAISコード" id="menu_tais"
+              parent="menu_root" sequence="20"/>
+    <menuitem name="マスタ管理" id="menu_settings"
+              parent="menu_root" sequence="90"/>
+    <!-- menu actions -->
+    <menuitem name = "福祉用具" id="menu_product_template_action"
+              action="taisplus.product_template_act_window"
+              parent="menu_product" sequence="10"/>
+    <menuitem name = "価格表" id="menu_product_pricelist_action2"
+              action="product.product_pricelist_action2"
+              parent="menu_product" sequence="20"/>
+    <menuitem name = "仕入価格" id="menu_product_supplierinfo_type_action"
+              action="product.product_supplierinfo_type_action"
+              parent="menu_product" sequence="30"/>
+    
+    <menuitem name="TAISコード" id="menu_tais_action"
+              action="taisplus.tais_act_window"
+              parent="menu_tais" sequence="10"/>
+    <menuitem name="TAISコード取得（最新化）" id="menu_tais_import_action"
+              action="taisplus.tais_import_act_window"
+              parent="menu_tais" sequence="20"/>
+
+    <menuitem name="分類コード(CCTA95)" id="menu_ccta95_action"
+              action="taisplus.ccta95_act_window"
+              parent="menu_settings" sequence="10"/>
+
+    <menuitem name="貸与価格リスト" id="menu_pricelist_action"
+              action="taisplus.pricelist_act_window"
+              parent="menu_settings" sequence="20"/>
+    <menuitem name="貸与価格リストのインポート" id="menu_pricelist_import_action"
+              action="taisplus.pricelist_import_act_window"
+              parent="menu_settings" sequence="30"/>
+
+  </data>
+</odoo>

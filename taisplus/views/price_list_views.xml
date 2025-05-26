@@ -1,0 +1,53 @@
+<odoo>
+    <record id="pricelist_tree" model="ir.ui.view">
+        <field name="name">pricelist tree</field>
+        <field name="model">taisplus.pricelist</field>
+        <field name="arch" type="xml">
+            <tree string="上限価格リスト" default_order="tais_code_date desc">
+                <field name="name"/>
+                <field name="tais_code_date"/>
+                <field name="sheetname"/>
+                <field name="filename"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="pricelist_form" model="ir.ui.view">
+        <field name="name">pricelist form</field>
+        <field name="model">taisplus.pricelist</field>
+        <field name="arch" type="xml">
+            <form string="上限価格リスト">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="tais_code_date"/>
+                        <field name="sheetname"/>
+                        <field name="filename"/>
+                        <field name="notes"/>
+                    </group>
+                    <notebook>
+                        <page string="上限一覧">
+                            <field name="item_ids">
+                                <tree>
+                                    <field name="tais_code"/>
+                                    <field name="product_name"/>
+                                    <field name="average_price"/>
+                                    <field name="price_cap"/>
+                                    <field name="currency_id"  invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- アクション -->
+    <record id="pricelist_act_window" model="ir.actions.act_window">
+        <field name="name">上限価格リスト</field>
+        <field name="res_model">taisplus.pricelist</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
