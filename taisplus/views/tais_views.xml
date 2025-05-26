@@ -1,0 +1,85 @@
+<odoo>
+    <record id="tais_tree" model="ir.ui.view">
+        <field name="name">taisplus.tais.tree</field>
+        <field name="model">taisplus.tais</field>
+        <field name="arch" type="xml">
+            <tree string="TAISコード" decoration-warning="is_discontinued">
+                <field name="tais_code"/>
+                <field name="name"/>
+                <field name="model_number"/>
+                <field name="rental_service"/>
+                <field name="sales_service"/>
+                <field name="ccta95_id"/>
+                <field name="tais_url" widget="url"/>
+                <field name="is_discontinued"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="tais_form" model="ir.ui.view">
+        <field name="name">taisplus.tais.form</field>
+        <field name="model">taisplus.tais</field>
+        <field name="arch" type="xml">
+            <form string="TAISコード" default_order="tais_code asc">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="image" widget="image" class="oe_right oe_avatar" style="margin-right:24px;margin-top:24px;"/>
+                    </div>
+                    <group>
+                        <field name="tais_code"/>
+                        <field name="name"/>
+                        <field name="is_discontinued"/>
+                        <field name="tais_url" widget="url"/>
+                    </group>
+                    <notebook>
+                        <page string="詳細情報">
+                            <group>
+                                <field name="ccta95_id"/>
+                                <field name="rental_service"/>
+                                <field name="sales_service"/>
+                                <field name="manufacturer"/>
+                                <field name="model_number"/>
+                                <field name="image_url" widget="url"/>
+                                <field name="product_summary"/>
+                            </group>
+                        </page>
+                        <page string="貸与価格">
+                            <field name="pricelist_item_ids">
+                                <tree default_order="tais_code_date desc">
+                                    <field name="tais_code_date"/>
+                                    <field name="average_price"/>
+                                    <field name="price_cap"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="関連プロダクト">
+                            <field name="related_product_template_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- 検索ビュー -->
+    <record id="tais_search_view" model="ir.ui.view">
+        <field name="name">taisplus.tais.search.view</field>
+        <field name="model">taisplus.tais</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="コード/商品名/型番/分類" filter_domain="['|', '|', '|', ('ccta95_id.name', 'ilike', self), ('model_number', 'ilike', self), ('tais_code', 'ilike', self), ('name', 'ilike', self)]"/>
+                <field name="tais_code" string="TAISコード"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- アクション -->
+    <record id="tais_act_window" model="ir.actions.act_window">
+        <field name="name">TAISコード</field>
+        <field name="res_model">taisplus.tais</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="tais_search_view"/>
+    </record>
+
+</odoo>

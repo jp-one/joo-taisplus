@@ -1,14 +1,14 @@
 version: '2'
 services:
   app:
-    image: "odoo-addons-dev:18.0"
+    image: "odoo-addons-dev:16.0"
     #container_name: "app"
     build:
       context: "."
       dockerfile: odoo/Dockerfile
       args:
         # Update 'ODOO_VERSION' to pick a odoo version: master, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0
-        ODOO_VERSION: "18.0"
+        ODOO_VERSION: "16.0"
         SUPPORT_RTLCSS: "true"
         # Update 'VARIANT' to pick a Python version: 3, 3.6, 3.7, 3.8, 3.9, 3.10
         # Available image variants: https://github.com/microsoft/vscode-dev-containers/blob/main/containers/python-3/README.md

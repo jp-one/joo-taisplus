@@ -46,7 +46,7 @@ ignore-patterns=
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
 # See also - https://odoo-development.readthedocs.io/en/latest/ide/emacs/pylint.html
-init-hook='import sys; sys.path.append("/opt/odoo")'
+init-hook='import sys; sys.path.append("/opt/odoo/repo/odoo")'
 
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use.

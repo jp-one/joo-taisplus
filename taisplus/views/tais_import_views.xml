@@ -1,0 +1,26 @@
+<odoo>
+    <record id="tais_import_form" model="ir.ui.view">
+        <field name="name">taisplus.tais.import.form</field>
+        <field name="model">taisplus.tais.import</field>
+        <field name="arch" type="xml">
+            <form string="TAISコード取得（最新化）">
+                <group>
+                    <field name="tais_codes" widget="text"/>
+                </group>
+                <footer>
+                    <button string="実行" type="object" name="import_tais_codes" class="btn-primary"/>
+                    <button string="閉じる" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- アクション -->
+    <record id="tais_import_act_window" model="ir.actions.act_window">
+        <field name="name">TAISコード取得（最新化）</field>
+        <field name="res_model">taisplus.tais.import</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
