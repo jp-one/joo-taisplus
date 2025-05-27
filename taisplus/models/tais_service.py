@@ -1,9 +1,7 @@
-from dataclasses import asdict
-import json
-import re
-from bs4 import BeautifulSoup
-import requests
 from odoo import api, models
+from bs4 import BeautifulSoup
+import re
+import requests
 from ..schemas.tais import TaisData
 
 
@@ -193,27 +191,3 @@ class TaisService(models.AbstractModel):
             image_url=image_url,
             is_discontinued=is_discontinued,
         )
-
-    @api.model
-    def fetch_tais_product_json(self, tais_code):
-        """
-        Retrieve product information for the specified TAIS code and return it as JSON.
-
-        Args:
-            tais_code (str): TAIS code in the format '01234-012345'
-
-        Returns:
-            str: JSON string of product information
-        """
-        tais_url = self.generate_tais_url(tais_code)
-        try:
-            taisData = self.fetch_tais_product_details(tais_url)
-        except Exception as e:
-            raise RuntimeError(
-                f"Failed to fetch TAIS product information: {e} (URL: {tais_url})"
-            )
-        if taisData.tais_code != tais_code:
-            raise ValueError(
-                f"TAIS code mismatch. Expected: '{tais_code}', got: '{taisData.tais_code}'."
-            )
-        return json.dumps(asdict(taisData))
