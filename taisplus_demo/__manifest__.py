@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 {
     "name": "福祉用具(TAIS+)",
-    "version": "16.0.1.0.0",
+    "version": "16.0.2.0",
     "author": "jp-one",
     "license": "LGPL-3",
     "maintainer": "jp-one",
-    "website": "https://github.com/jp-one/joo-taisplus",
+    "website": "https://jp-one.github.io/joo-taisplus/",
     "summary": """
         (デモ・アプリ)福祉用具情報システム(TAIS)を活用し、貸与・販売する福祉用具商品を管理する
     """,
