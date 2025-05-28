@@ -2,7 +2,6 @@ from odoo import api, models
 from dataclasses import asdict
 from datetime import date, datetime
 import json
-import pytz
 from .product_service import ProductService
 
 
@@ -22,7 +21,9 @@ class ApiService(models.AbstractModel):
         Returns:
             str: A JSON string containing product details, sales price, purchase price, and TAIS price cap.
         """
-        productService = self.env["taisplus_demo.product.service"]  # type: ProductService
+        productService = self.env[
+            "taisplus_demo.product.service"
+        ]  # type: ProductService
         local_datetime = self._fromisoformat_to_local(date_string)
         aidProductData = productService.get_aid_product(default_code, local_datetime)
         return json.dumps(asdict(aidProductData), default=self.date_serializer)

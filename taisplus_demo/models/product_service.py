@@ -7,6 +7,7 @@ from ..schemas import AidPriceData, AidVenderPriceData, AidProductData
 # from taisplus.models.pricelist_service import PriceListService
 # from addons.product.models.product_supplierinfo import SupplierInfo
 
+
 class ProductService(models.AbstractModel):
     _name = "taisplus_demo.product.service"
     _description = "Product Service"
