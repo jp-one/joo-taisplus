@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # add to the odoo registry.
+from .api_service import ApiService
 from .ccta95 import Ccta95
 from .pricelist_import import PriceListImport
 from .pricelist_item import PriceListItem

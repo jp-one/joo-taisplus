@@ -1,7 +1,5 @@
 from odoo import api, models
 from datetime import date, datetime
-from dataclasses import asdict
-import json
 import pytz
 from ..schemas import AidPriceData, AidVenderPriceData, AidProductData
 
@@ -10,28 +8,9 @@ from ..schemas import AidPriceData, AidVenderPriceData, AidProductData
 # from addons.product.models.product_supplierinfo import SupplierInfo
 
 
-def date_serializer(obj):
-    """Custom serializer for date objects."""
-    if isinstance(obj, date):
-        return obj.isoformat()
-    return obj  # Return the object as-is if it's not serializable
-
-
 class ProductService(models.AbstractModel):
-    _name = "product_tais.product.service"
+    _name = "taisplus_demo.product.service"
     _description = "Product Service"
-
-    def _fromisoformat_to_local(self, date_string: str) -> datetime:
-        """
-        Convert an ISO format date string to a datetime object in the user's local timezone.
-        """
-        user_timezone = pytz.timezone(self.env.user.tz)
-        dt_parsed = datetime.fromisoformat(date_string)
-        if dt_parsed.tzinfo is None:
-            dt_local = user_timezone.localize(dt_parsed)
-        else:
-            dt_local = dt_parsed.astimezone(user_timezone)
-        return dt_local
 
     def _get_sales_price(
         self, product_tmpl_id: int, product_id: int, target_datetime: datetime
@@ -155,7 +134,7 @@ class ProductService(models.AbstractModel):
         return taisPriceCap
 
     @api.model
-    def get_tais_product(self, default_code: str, target_local_datetime: datetime):
+    def get_aid_product(self, default_code: str, target_local_datetime: datetime):
         # default_code (Internal Reference)
         product_product = self.env["product.product"]
         product = product_product.search(
@@ -202,20 +181,3 @@ class ProductService(models.AbstractModel):
             purchase_price=purchase_price,
             tais_pricecap=taisPriceCap,
         )
-
-    @api.model
-    def get_tais_product_json(self, default_code: str, date_string: str):
-        """
-        Returns TAIS product information as a JSON string.
-
-        Args:
-            default_code (str): The internal reference code of the product.
-            date_string (str): The target date and time in ISO format (e.g., '2024-05-25T12:00:00').
-                You can also specify only the date (e.g., '2024-05-25'). In this case, the time will be set to 00:00:00.
-
-        Returns:
-            str: A JSON string containing product details, sales price, purchase price, and TAIS price cap.
-        """
-        local_datetime = self._fromisoformat_to_local(date_string)
-        aidProductData = self.get_tais_product(default_code, local_datetime)
-        return json.dumps(asdict(aidProductData), default=date_serializer)
