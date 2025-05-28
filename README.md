@@ -96,7 +96,7 @@ TAISに登録された福祉用具には、6桁の分類コード (CCTA95) が�
 `TAIS+`モジュールでは、特定のTAISコードと日付に基づいて貸与価格の上限を取得するAPIを提供しています。
 
 - **モデルとメソッド**  
-  - モデル: `taisplus.pricelist.service`
+  - モデル: `taisplus.api.service`
   - メソッド: `get_tais_price_cap_json`
 
 - **パラメータ**  
@@ -153,7 +153,7 @@ TAISに登録された福祉用具には、6桁の分類コード (CCTA95) が�
     ' 取得
     args.Add "01234-012345" ' TAISコード
     args.Add "2023-10-01"   ' 日付（文字列）
-    Set ret = cl.Model("taisplus.pricelist.service").ExecuteKw("get_tais_price_cap_json", args)
+    Set ret = cl.Model("taisplus.api.service").ExecuteKw("get_tais_price_cap_json", args)
     Debug.Print ret.JsonResult
     
     ' JSON文字列をDictionaryへ変換
