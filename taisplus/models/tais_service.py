@@ -165,12 +165,15 @@ class TaisService(models.AbstractModel):
                 )
 
         # Image URL
-        image_url_img = div_right.find("img")
-        image_url = (
-            self._BASE_URL_TAIS + image_url_img["src"].lstrip("./")
-            if image_url_img and "src" in image_url_img.attrs
-            else None
-        )
+        image_url = None
+        image_url_div = div_right.find("div", class_="c-slide2__inner")
+        if image_url_div:
+            image_url_img = image_url_div.find("img")
+            image_url = (
+                self._BASE_URL_TAIS + image_url_img["src"].lstrip("./")
+                if image_url_img and "src" in image_url_img.attrs
+                else None
+            )
 
         # Check if the product is discontinued
         discontinued_tag = div_right.find("p", string="生産終了")
