@@ -108,5 +108,6 @@ ENV PATH=/opt/odoo/scripts:${PATH}
 # Expose Odoo services
 EXPOSE 8069 8071 8072
 
+USER vscode
 ENTRYPOINT ["/opt/odoo/entrypoint.sh"]
 CMD ["odoo"]

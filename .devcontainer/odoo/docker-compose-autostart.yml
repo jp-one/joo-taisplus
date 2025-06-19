@@ -2,8 +2,3 @@ version: '2'
 services:
   app:
     command: odoo-dev
-    restart: always
-  db:
-    restart: always
-  lb:
-    restart: always
