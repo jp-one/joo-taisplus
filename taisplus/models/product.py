@@ -6,6 +6,24 @@ class ProductProduct(models.Model):
 
     tais_code = fields.Char(string="TAISコード")
 
+    pricelist_item_ids = fields.One2many(
+        comodel_name="taisplus.pricelist.item",
+        inverse_name="id",  # dummy. not actually used.
+        string="TAIS貸与価格明細",
+        compute="_compute_pricelist_item_ids",
+        store=False,
+    )
+
+    def _compute_pricelist_item_ids(self):
+        for product in self:
+            if product.tais_code:
+                items = self.env["taisplus.pricelist.item"].search(
+                    [("tais_code", "=", product.tais_code)]
+                )
+                product.pricelist_item_ids = items
+            else:
+                product.pricelist_item_ids = self.env["taisplus.pricelist.item"]
+
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
@@ -77,3 +95,24 @@ class ProductTemplate(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.tais_code = self.tais_code
+
+    pricelist_item_ids = fields.One2many(
+        comodel_name="taisplus.pricelist.item",
+        inverse_name="id",  # dummy. not actually used.
+        string="TAIS貸与価格明細",
+        compute="_compute_pricelist_item_ids",
+        store=False,
+    )
+
+    def _compute_pricelist_item_ids(self):
+        for template in self:
+            tais_codes = [
+                v.tais_code for v in template.product_variant_ids if v.tais_code
+            ]
+            if tais_codes:
+                items = self.env["taisplus.pricelist.item"].search(
+                    [("tais_code", "in", tais_codes)]
+                )
+            else:
+                items = self.env["taisplus.pricelist.item"]
+            template.pricelist_item_ids = items

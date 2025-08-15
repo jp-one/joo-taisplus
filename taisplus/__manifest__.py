@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "TAIS+",
-    "version": "16.0.2.0",
+    "version": "16.0.2.2",
     "author": "jp-one",
     "license": "LGPL-3",
     "website": "https://jp-one.github.io/joo-taisplus/",

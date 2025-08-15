@@ -4,6 +4,7 @@ from odoo import models, fields
 class PriceListItem(models.Model):
     _name = "taisplus.pricelist.item"
     _description = "TAIS Code Price List (detail)"
+    _order = 'tais_code asc, tais_code_date desc'
 
     name = fields.Char(
         string="TAISコード:適用開始日",
@@ -17,7 +18,7 @@ class PriceListItem(models.Model):
 
     currency_id = fields.Many2one(
         "res.currency",
-        string="Currency",
+        string="通貨",
         default=lambda self: self.env.ref("base.JPY"),  # Default to Japanese Yen
         required=True,
     )
