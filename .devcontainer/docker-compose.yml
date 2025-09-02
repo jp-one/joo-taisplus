@@ -10,9 +10,9 @@ services:
         # Update 'ODOO_VERSION' to pick a odoo version: master, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0
         ODOO_VERSION: "16.0"
         SUPPORT_RTLCSS: "true"
-        # Update 'VARIANT' to pick a Python version: 3, 3.6, 3.7, 3.8, 3.9, 3.10
+        # Update 'VARIANT' to pick a Python version: 3, 3.10, 3.11, 3.12
         # Available image variants: https://github.com/microsoft/vscode-dev-containers/blob/main/containers/python-3/README.md
-        VARIANT: "3.10"
+        VARIANT: "3.12"
     volumes:
       - ./odoo/.vscode:/opt/odoo/.vscode:cached
       - ..:/opt/odoo/custom_addons:cached
