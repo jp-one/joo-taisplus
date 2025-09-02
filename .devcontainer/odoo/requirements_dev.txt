@@ -1,0 +1,5 @@
+pip
+build
+pytest
+pytest-cov
+ipykernel

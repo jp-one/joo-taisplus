@@ -1,19 +1,8 @@
-## See here for image contents: https://github.com/microsoft/vscode-dev-containers/blob/v0.163.0/containers/python-3/.devcontainer/base.Dockerfile
-## Available image variants: https://github.com/microsoft/vscode-dev-containers/blob/main/containers/python-3/README.md
+# See here for image contents: https://github.com/devcontainers/images/tree/main/src/python
+# Available image variants: https://github.com/devcontainers/templates/blob/main/src/python/devcontainer-template.json
 ARG VARIANT="3"
-FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
-
-# [Optional] Allow the vscode user to pip install globally w/o sudo
-RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade pip
-ENV PIP_TARGET=/usr/local/pip-global
-#ENV PYTHONPATH=${PIP_TARGET}:${PYTHONPATH}
-ENV PYTHONPATH=${PIP_TARGET}
-ENV PATH=${PIP_TARGET}/bin:${PATH}
-RUN if ! cat /etc/group | grep -e "^pip-global:" > /dev/null 2>&1; then groupadd -r pip-global; fi \
-    && usermod -a -G pip-global vscode \
-    && umask 0002 && mkdir -p ${PIP_TARGET} \
-    && chown :pip-global ${PIP_TARGET} \
-    && ( [ ! -f "/etc/profile.d/00-restore-env.sh" ] || sed -i -e "s/export PATH=/export PATH=\/usr\/local\/pip-global:/" /etc/profile.d/00-restore-env.sh )
+FROM mcr.microsoft.com/devcontainers/python:1-${VARIANT}-bookworm
+ARG PYTHONPATH=""
 
 # [Option] Install Node.js
 # ARG INSTALL_NODE="true"
@@ -32,6 +21,11 @@ RUN if ! cat /etc/group | grep -e "^pip-global:" > /dev/null 2>&1; then groupadd
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
 
+# Install dev requirements
+COPY ./odoo/requirements_dev.txt /tmp/pip-tmp/
+RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade -r /tmp/pip-tmp/requirements_dev.txt \
+   && rm -rf /tmp/pip-tmp
+
 # Create directory and set permission
 RUN mkdir /opt/odoo && chown -R vscode:vscode /opt/odoo
 RUN mkdir /opt/odoo/repos && chown -R vscode:vscode /opt/odoo/repos
@@ -39,7 +33,7 @@ RUN mkdir /opt/odoo/repos && chown -R vscode:vscode /opt/odoo/repos
 WORKDIR /opt/odoo/repos
 
 # Install Odoo
-ENV PYTHONPATH=/opt/odoo/repos/odoo:${PYTHONPATH}
+ENV PYTHONPATH=/opt/odoo/repos/odoo${PYTHONPATH:+:$(PYTHONPATH)}
 USER vscode
 ARG ODOO_VERSION="master"
 RUN git clone --branch=${ODOO_VERSION} --depth=1 https://github.com/odoo/odoo.git odoo
@@ -56,7 +50,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
         python3-vobject python3-watchdog python3-xlrd python3-xlwt
 
 # Update specific package versions in the requirements file to avoid build errors
-ARG AVOID_BUILD_ERRORS="true"
+ARG AVOID_BUILD_ERRORS="false"
 RUN if [ "${AVOID_BUILD_ERRORS}" = "true" ]; then \
     cp odoo/requirements.txt odoo/requirements.txt.org \
     && sed -i -e "s/gevent==21.8.0/gevent==22.10.2/g" \
@@ -65,17 +59,17 @@ RUN if [ "${AVOID_BUILD_ERRORS}" = "true" ]; then \
     fi
 
 # Install dependencies
-RUN pip3 --disable-pip-version-check --no-cache-dir install -r odoo/requirements.txt
+RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade -r odoo/requirements.txt
 
-# Install wkhtmltopdf
-# See also: https://www.odoo.com/documentation/master/administration/install/install.html#dependencies
-# > Important
-# > wkhtmltopdf is not installed through pip and must be installed manually in version 0.12.5 for it to support headers and footers.
-# > See our wiki for more details on the various versions. 
-# > [version 0.12.5] https://github.com/wkhtmltopdf/wkhtmltopdf/releases/tag/0.12.5
-# > [our wiki] https://github.com/odoo/odoo/wiki/Wkhtmltopdf
-RUN curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.buster_amd64.deb \
-    && echo 'ea8277df4297afc507c61122f3c349af142f31e5 wkhtmltox.deb' | sha1sum -c - \
+# Install wkhtmltopdf, bookworm_amd64 version
+# https://www.odoo.com/documentation/master/administration/on_premise/source.html#dependencies
+# > Warning
+# > wkhtmltopdf is not installed through pip and must be installed manually in version 0.12.6 for it to support headers and footers.
+# > Check out the wkhtmltopdf wiki for more details on the various versions.
+# > [version 0.12.6] https://github.com/wkhtmltopdf/packaging/releases/tag/0.12.6.1-3
+# > [the wkhtmltopdf wiki] https://github.com/odoo/odoo/wiki/Wkhtmltopdf
+RUN curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
+    && echo 'e9f95436298c77cc9406bd4bbd242f4771d0a4b2 wkhtmltox.deb' | sha1sum -c - \
     && apt-get install -y --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* wkhtmltox.deb
 
@@ -97,8 +91,6 @@ RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade bobtemplat
 RUN mkdir /opt/odoo/.vscode /opt/odoo/custom_addons /opt/odoo/data /opt/odoo/scripts /opt/odoo/templates \
     && chown vscode:vscode /opt/odoo/.vscode /opt/odoo/custom_addons /opt/odoo/data /opt/odoo/scripts /opt/odoo/templates
 RUN mkdir /etc/odoo
-RUN mkdir /home/vscode/.vscode-server \
-    && chown vscode:vscode /home/vscode/.vscode-server
 ENV CUSTOM_ADDONS=/opt/odoo/custom_addons
 
 # odoo server configuration environment files
