@@ -19,6 +19,9 @@
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
             <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="tais_code"/>
+                </field>
                 <xpath expr="//sheet" position="inside">
                     <notebook>
                         <page string="TAIS貸与価格">
@@ -37,9 +40,6 @@
                         </page>
                     </notebook>
                 </xpath>
-                <field name="barcode" position="after">
-                    <field name="tais_code"/>
-                </field>
             </field>
         </record>
 
@@ -49,6 +49,9 @@
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_normal_form_view"/>
             <field name="arch" type="xml">
+                <field name="barcode" position="after">
+                    <field name="tais_code"/>
+                </field>
                 <xpath expr="//notebook" position="inside">
                     <page string="TAIS貸与価格">
                         <field name="pricelist_item_ids" nolabel="1">
