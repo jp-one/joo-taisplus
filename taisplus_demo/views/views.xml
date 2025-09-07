@@ -31,10 +31,10 @@
               action="taisplus.ccta95_act_window"
               parent="menu_settings" sequence="10"/>
 
-    <menuitem name="貸与価格リスト" id="menu_pricelist_action"
+    <menuitem name="TAIS貸与価格リスト" id="menu_pricelist_action"
               action="taisplus.pricelist_act_window"
               parent="menu_settings" sequence="20"/>
-    <menuitem name="貸与価格リストのインポート" id="menu_pricelist_import_action"
+    <menuitem name="TAIS貸与価格ファイルのインポート" id="menu_pricelist_import_action"
               action="taisplus.pricelist_import_act_window"
               parent="menu_settings" sequence="30"/>
 

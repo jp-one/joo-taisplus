@@ -24,12 +24,14 @@ class PriceListImport(models.TransientModel):
         if not (
             filename.lower().endswith(".xlsx") or filename.lower().endswith(".xls")
         ):
-            raise ValueError("Filename must have an extension of .xlsx or .xls.")
+            raise ValueError(
+                "Filename must have an extension of .xlsx or .xls.")
 
         # Extract date and expected headers
         try:
             if "_" in filename:
                 # pricelist_YYYY-MM-DD_○○.xlsx or .xls
+                file_publisher = "厚生労働省"
                 date_str = filename.split("_")[1]
                 header_date = datetime.strptime(date_str, "%Y-%m-%d").date()
                 expected_headers = [
@@ -42,8 +44,10 @@ class PriceListImport(models.TransientModel):
                 ]
             else:
                 # pricelistYYYYMM.xlsx or .xls
+                file_publisher = "テクノエイド協会"
                 date_str = filename[9:15]
-                header_date = datetime.strptime(date_str, "%Y%m").replace(day=1).date()
+                header_date = datetime.strptime(
+                    date_str, "%Y%m").replace(day=1).date()
                 expected_headers = [
                     "コード",
                     "法人名",
@@ -66,7 +70,8 @@ class PriceListImport(models.TransientModel):
 
         if filename.lower().endswith(".xlsx"):
             workbook = openpyxl.load_workbook(BytesIO(file_content))
-            sheet_names = ", ".join(sheet.title for sheet in workbook.worksheets)
+            sheet_names = ", ".join(
+                sheet.title for sheet in workbook.worksheets)
             for sheet in workbook.worksheets:
                 header_row = None
                 for row_idx in range(1, 7):
@@ -135,7 +140,7 @@ class PriceListImport(models.TransientModel):
             " ".join(str(cell) for cell in row if cell) for row in titles if any(row)
         )
 
-        header_name = f"上限一覧 {header_date.strftime('%Y-%m-%d')}"
+        header_name = f"TAIS貸与価格 {header_date.strftime('%Y-%m-%d')} [{file_publisher}版]"
         header_rec = pricelist_model.search(
             [("tais_code_date", "=", header_date)], limit=1
         )

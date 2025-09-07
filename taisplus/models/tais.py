@@ -2,6 +2,7 @@ import base64
 import requests
 import logging
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -9,6 +10,7 @@ _logger = logging.getLogger(__name__)
 class Tais(models.Model):
     _name = "taisplus.tais"
     _description = "TAIS Code"
+    _order = 'tais_code asc'
 
     _sql_constraints = [
         ("tais_code", "UNIQUE(tais_code)", "The tais_code must be unique!")
@@ -71,14 +73,14 @@ class Tais(models.Model):
     )
     image_url = fields.Char(string="画像リンク", help="商品に関連する画像のURLです。")
     tais_url = fields.Char(string="TAIS URL", help="福祉用具情報システムのURLです。")
-    image = fields.Binary(string="Image", compute="_compute_image_url")
+    image = fields.Binary(string="Image", compute="_compute_image", store=True)
     product_summary = fields.Text(string="製品概要")
     is_discontinued = fields.Boolean(string="生産終了", default=False)
 
     pricelist_item_ids = fields.One2many(
         comodel_name="taisplus.pricelist.item",
         inverse_name="id",
-        string="価格リスト",
+        string="TAIS貸与価格の履歴",
         compute="_compute_pricelist_item_ids",
         store=False,
     )
@@ -86,13 +88,33 @@ class Tais(models.Model):
     related_product_template_ids = fields.One2many(
         comodel_name="product.template",
         inverse_name="id",
-        string="関連プロダクト",
+        string="プロダクト",
         compute="_compute_related_product_template_ids",
         store=False,
     )
 
+    related_product_template_count = fields.Integer(
+        string="プロダクト",    # wiget=statinfoで表示するため、ここは"プロダクト"のままにする
+        compute="_compute_related_product_template_count",
+        store=False,
+    )
+
+    related_product_product_ids = fields.One2many(
+        comodel_name="product.product",
+        inverse_name="id",
+        string="バリアント",
+        compute="_compute_related_product_product_ids",
+        store=False,
+    )
+
+    related_product_product_count = fields.Integer(
+        string="バリアント",    # wiget=statinfoで表示するため、ここは"バリアント"のままにする
+        compute="_compute_related_product_product_count",
+        store=False,
+    )
+
     @api.depends("image_url")
-    def _compute_image_url(self):
+    def _compute_image(self):
         for record in self:
             record.image = False
             if record.image_url:
@@ -105,7 +127,6 @@ class Tais(models.Model):
                         f"Failed to fetch image from URL {record.image_url}: {e}"
                     )
 
-    @api.depends("pricelist_item_ids")
     def _compute_pricelist_item_ids(self):
         for record in self:
             items = self.env["taisplus.pricelist.item"].search(
@@ -113,15 +134,57 @@ class Tais(models.Model):
             )
             record.pricelist_item_ids = items
 
-    @api.depends("related_product_template_ids")
     def _compute_related_product_template_ids(self):
         for record in self:
-            products = self.env["product.product"].search(
+            record.related_product_template_ids = self.env["product.template"].search(
                 [("tais_code", "=", record.tais_code)]
             )
-            template_ids = products.mapped("product_tmpl_id").ids
-            templates = self.env["product.template"].browse(template_ids)
-            record.related_product_template_ids = templates
+
+    @api.depends('related_product_template_ids')
+    def _compute_related_product_template_count(self):
+        for record in self:
+            record.related_product_template_count = len(
+                record.related_product_template_ids) if record.related_product_template_ids else 0
+
+    def _compute_related_product_product_ids(self):
+        for record in self:
+            record.related_product_product_ids = self.env["product.product"].search(
+                [("tais_code", "=", record.tais_code)]
+            )
+
+    @api.depends('related_product_product_ids')
+    def _compute_related_product_product_count(self):
+        for record in self:
+            record.related_product_product_count = len(
+                record.related_product_product_ids) if record.related_product_product_ids else 0
 
     def name_get(self):
         return [(record.id, f"[{record.tais_code}] {record.name}") for record in self]
+
+    def action_open_filtered_templates(self):
+        self.ensure_one()
+        if not self.related_product_template_count > 0:
+            raise UserError("関連するプロダクトが存在しません。")
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'プロダクト',
+            'res_model': 'product.template',
+            'view_mode': 'tree,form',
+            'domain': [('tais_code', '=', self.tais_code)],
+            'context': {'search_default_tais_code': self.tais_code},
+            'target': 'current',
+        }
+
+    def action_open_filtered_products(self):
+        self.ensure_one()
+        if not self.related_product_product_count > 0:
+            raise UserError("関連するバリアントが存在しません。")
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'バリアント',
+            'res_model': 'product.product',
+            'view_mode': 'tree,form',
+            'domain': [('tais_code', '=', self.tais_code)],
+            'context': {'search_default_tais_code': self.tais_code},
+            'target': 'current',
+        }

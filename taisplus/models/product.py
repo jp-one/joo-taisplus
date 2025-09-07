@@ -24,6 +24,9 @@ class ProductProduct(models.Model):
             else:
                 product.pricelist_item_ids = self.env["taisplus.pricelist.item"]
 
+    def search_products_by_tais_code(self, tais_code):
+        return self.env['product.product'].search([('tais_code', '=', tais_code)])
+
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
@@ -92,7 +95,8 @@ class ProductTemplate(models.Model):
         if variant_count == 1:
             self.product_variant_ids.tais_code = self.tais_code
         elif variant_count == 0:
-            archived_variants = self.with_context(active_test=False).product_variant_ids
+            archived_variants = self.with_context(
+                active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.tais_code = self.tais_code
 
@@ -116,3 +120,6 @@ class ProductTemplate(models.Model):
             else:
                 items = self.env["taisplus.pricelist.item"]
             template.pricelist_item_ids = items
+
+    def search_templates_by_tais_code(self, tais_code):
+        return self.env['product.template'].search([('tais_code', '=', tais_code)])
