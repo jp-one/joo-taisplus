@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "福祉用具(TAIS+)",
-    "version": "16.0.2.0",
+    "version": "16.0.2.4",
     "author": "jp-one",
     "license": "LGPL-3",
     "maintainer": "jp-one",
