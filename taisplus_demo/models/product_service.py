@@ -1,5 +1,5 @@
 from odoo import api, models
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import pytz
 from ..schemas import AidPriceData, AidVenderPriceData, AidProductData
 
@@ -12,13 +12,43 @@ class ProductService(models.AbstractModel):
     _name = "taisplus_demo.product.service"
     _description = "Product Service"
 
-    def _get_sales_price(
-        self, product_tmpl_id: int, product_id: int, target_datetime: datetime
-    ):
+    def get_list_price_change_datetimes(self, product_tmpl_id: int, product_id: int, from_datetime: datetime, to_datetime: datetime):
+        product_pricelist_item_model = self.env["product.pricelist.item"]
+        query = (
+            "SELECT id FROM product_pricelist_item"
+            + " WHERE active AND min_quantity = 0 AND compute_price = 'fixed'"
+            + "   AND (product_tmpl_id = %s OR product_tmpl_id IS NULL)"
+            + "   AND (product_id = %s OR product_id IS NULL)"
+            + "   AND ("
+            + "         (date_start BETWEEN %s AND %s)"
+            + "      OR (date_end BETWEEN %s AND %s)"
+            + "       )"
+        )
 
-        product_pricelist_item_model = self.env[
-            "product.pricelist.item"
-        ]  # type: PriceListItem
+        params = (
+            product_tmpl_id,
+            product_id,
+            from_datetime, to_datetime,  # for date_start BETWEEN
+            from_datetime, to_datetime   # for date_end BETWEEN
+        )
+
+        product_pricelist_item_model.env.cr.execute(query, params)
+        result_ids = [row[0]
+                      for row in product_pricelist_item_model.env.cr.fetchall()]
+        change_points = set()
+        change_points.add(from_datetime)
+        for item in product_pricelist_item_model.browse(result_ids):
+            if item.date_start:
+                if (from_datetime <= item.date_start) and (item.date_start < to_datetime):
+                    change_points.add(item.date_start)
+            if item.date_end:
+                date_end_plused_one = item.date_end + timedelta(seconds=1)
+                if (from_datetime <= date_end_plused_one) and (date_end_plused_one < to_datetime):
+                    change_points.add(date_end_plused_one)
+        return change_points
+
+    def fetchone_product_pricelist_item(self, product_tmpl_id: int, product_id: int, target_datetime: datetime):
+        product_pricelist_item_model = self.env["product.pricelist.item"]
         query = (
             "SELECT id FROM product_pricelist_item"
             + " WHERE active AND min_quantity = 0 AND compute_price = 'fixed'"
@@ -37,7 +67,16 @@ class ProductService(models.AbstractModel):
         product_pricelist_item_model.env.cr.execute(query, params)
         pricelist_item = product_pricelist_item_model.env.cr.fetchone()
         if pricelist_item:
-            pricelist_item = product_pricelist_item_model.browse(pricelist_item[0])
+            pricelist_item = product_pricelist_item_model.browse(
+                pricelist_item[0])
+        return pricelist_item
+
+    def _get_sales_price(
+        self, product_tmpl_id: int, product_id: int, target_datetime: datetime
+    ):
+        pricelist_item = self.fetchone_product_pricelist_item(
+            product_tmpl_id, product_id, target_datetime)
+        if pricelist_item:
             user_timezone = pytz.timezone(self.env.user.tz)
             return AidPriceData(
                 target_datetime=target_datetime,

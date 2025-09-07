@@ -3,7 +3,7 @@
         <field name="name">pricelist tree</field>
         <field name="model">taisplus.pricelist</field>
         <field name="arch" type="xml">
-            <tree string="上限価格リスト" default_order="tais_code_date desc">
+            <tree string="TAIS貸与価格リスト">
                 <field name="name"/>
                 <field name="tais_code_date"/>
                 <field name="sheetname"/>
@@ -16,7 +16,7 @@
         <field name="name">pricelist form</field>
         <field name="model">taisplus.pricelist</field>
         <field name="arch" type="xml">
-            <form string="上限価格リスト">
+            <form string="TAIS貸与価格リスト">
                 <sheet>
                     <group>
                         <field name="name"/>
@@ -26,16 +26,8 @@
                         <field name="notes"/>
                     </group>
                     <notebook>
-                        <page string="上限一覧">
-                            <field name="item_ids">
-                                <tree>
-                                    <field name="tais_code"/>
-                                    <field name="product_name"/>
-                                    <field name="average_price"/>
-                                    <field name="price_cap"/>
-                                    <field name="currency_id"  invisible="1"/>
-                                </tree>
-                            </field>
+                        <page string="TAIS貸与価格">
+                            <field name="item_ids"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -43,9 +35,74 @@
         </field>
     </record>
 
+    <record id="pricelist_item_view_tree" model="ir.ui.view">
+        <field name="name">pricelist.item.tree</field>
+        <field name="model">taisplus.pricelist.item</field>
+        <field name="arch" type="xml">
+            <tree string="TAIS貸与価格" decoration-warning="price_cap_exceeded">
+                <field name="tais_code_date"/>
+                <field name="tais_code"/>
+                <field name="product_name"/>
+                <field name="average_price"/>
+                <field name="price_cap"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="price_cap_exceeded"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="pricelist_item_view_form" model="ir.ui.view">
+        <field name="name">pricelist.item.form</field>
+        <field name="model">taisplus.pricelist.item</field>
+        <field name="arch" type="xml">
+        <form string="TAIS貸与価格">
+            <sheet>
+                <field name="name"  invisible="1"/>
+                <field name="pricelist_id" invisible="1"/>
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_open_filtered_templates"
+                            icon="fa-th-list"
+                            string="プロダクト"
+                            type="object"
+                            class="oe_stat_button">
+                        <field name="related_product_template_count" widget="statinfo"/>
+                    </button>
+                    <button name="action_open_filtered_products"
+                            icon="fa-sitemap"
+                            string="バリアント"
+                            type="object"
+                            class="oe_stat_button">
+                        <field name="related_product_product_count" widget="statinfo"/>
+                    </button>
+                </div>
+                <group>
+                    <group string="基本情報">
+                        <field name="tais_code"/>
+                        <field name="product_name"/>
+                        <field name="manufacturer"/>
+                        <field name="model_number"/>
+                    </group>
+                    <group string="価格情報">
+                        <field name="tais_code_date"/>
+                        <field name="average_price"/>
+                        <field name="price_cap"/>
+                        <field name="currency_id"/>
+                        <field name="price_cap_exceeded"/>
+                    </group>
+                </group>
+                <notebook>
+                    <page string="プロダクト">
+                        <field name="related_product_template_ids"/>
+                    </page>
+                </notebook>
+            </sheet>
+        </form>
+        </field>
+    </record>
+
     <!-- アクション -->
     <record id="pricelist_act_window" model="ir.actions.act_window">
-        <field name="name">上限価格リスト</field>
+        <field name="name">TAIS貸与価格リスト</field>
         <field name="res_model">taisplus.pricelist</field>
         <field name="view_mode">tree,form</field>
     </record>
