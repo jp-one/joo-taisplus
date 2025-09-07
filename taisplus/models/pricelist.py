@@ -4,9 +4,10 @@ from odoo import models, fields
 class PriceList(models.Model):
     _name = "taisplus.pricelist"
     _description = "TAIS Code Price List (header)"
+    _order = 'tais_code_date desc'
 
     name = fields.Char(
-        string="貸与価格のリスト名",
+        string="リスト名",
         required=True,
     )
     tais_code_date = fields.Date(
@@ -20,8 +21,22 @@ class PriceList(models.Model):
     item_ids = fields.One2many(
         comodel_name="taisplus.pricelist.item",
         inverse_name="pricelist_id",
-        string="貸与価格",
+        string="TAIS貸与価格",
     )
+
+    # 注意： 処理コストが高いため、利用には注意が必要
+    exceeded_item_ids = fields.One2many(
+        comodel_name="taisplus.pricelist.item",
+        inverse_name="pricelist_id",
+        string="上限超過",
+        compute="_compute_exceeded_items",
+        store=False,
+    )
+
+    def _compute_exceeded_items(self):
+        for record in self:
+            record.exceeded_item_ids = record.item_ids.filtered(
+                lambda item: item.price_cap_exceeded)
 
     _sql_constraints = [
         (
